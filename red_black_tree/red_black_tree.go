@@ -1,10 +1,4 @@
-package main
-
-import (
-	"fmt"
-	"math/rand"
-	"time"
-)
+package red_black_tree
 
 type Color int
 
@@ -46,16 +40,16 @@ func (self *Node) isNil() bool {
 }
 
 type RedBlackTree struct {
-	root *Node
+	Root *Node
 	size int
 }
 
 func NewRedBlackTree() *RedBlackTree {
-	tree := &RedBlackTree{root: NilNode, size: 0}
+	tree := &RedBlackTree{Root: NilNode, size: 0}
 	return tree
 }
 
-func (tree *RedBlackTree) add(key int) {
+func (tree *RedBlackTree) Add(key int) {
 	tree.insert(NewNode(key, Red))
 }
 
@@ -63,7 +57,7 @@ func (tree *RedBlackTree) insert(x *Node) {
 	tree.insertHelper(x)
 
 	x.color = Red
-	for x != tree.root && x.parent.color == Red {
+	for x != tree.Root && x.parent.color == Red {
 		if x.parent == x.parent.parent.left {
 			y := x.parent.parent.right
 			if !y.isNil() && y.color == Red {
@@ -98,12 +92,12 @@ func (tree *RedBlackTree) insert(x *Node) {
 			}
 		}
 	}
-	tree.root.color = Black
+	tree.Root.color = Black
 }
 
 func (tree *RedBlackTree) insertHelper(z *Node) {
 	y := NilNode
-	x := tree.root
+	x := tree.Root
 	for !x.isNil() {
 		y = x
 		if z.key < x.key {
@@ -114,7 +108,7 @@ func (tree *RedBlackTree) insertHelper(z *Node) {
 	}
 	z.parent = y
 	if y.isNil() {
-		tree.root = z
+		tree.Root = z
 	} else {
 		if z.key < y.key {
 			y.left = z
@@ -133,7 +127,7 @@ func (tree *RedBlackTree) leftRotate(x *Node) {
 	}
 	y.parent = x.parent
 	if x.parent.isNil() {
-		tree.root = y
+		tree.Root = y
 	} else {
 		if x == x.parent.left {
 			x.parent.left = y
@@ -153,7 +147,7 @@ func (tree *RedBlackTree) rightRotate(x *Node) {
 	}
 	y.parent = x.parent
 	if x.parent.isNil() {
-		tree.root = y
+		tree.Root = y
 	} else {
 		if x == x.parent.left {
 			x.parent.left = y
@@ -165,9 +159,9 @@ func (tree *RedBlackTree) rightRotate(x *Node) {
 	x.parent = y
 }
 
-func (tree *RedBlackTree) minimum(x *Node) *Node {
+func (tree *RedBlackTree) Minimum(x *Node) *Node {
 	if x == nil {
-		x = tree.root
+		x = tree.Root
 	}
 	for !x.left.isNil() {
 		x = x.left
@@ -175,9 +169,9 @@ func (tree *RedBlackTree) minimum(x *Node) *Node {
 	return x
 }
 
-func (tree *RedBlackTree) maximum(x *Node) *Node {
+func (tree *RedBlackTree) Maximum(x *Node) *Node {
 	if x == nil {
-		x = tree.root
+		x = tree.Root
 	}
 	for !x.right.isNil() {
 		x = x.right
@@ -187,7 +181,7 @@ func (tree *RedBlackTree) maximum(x *Node) *Node {
 
 func (tree *RedBlackTree) successor(x *Node) *Node {
 	if !x.right.isNil() {
-		return tree.minimum(x.right)
+		return tree.Minimum(x.right)
 	}
 	y := x.parent
 	for !y.isNil() && x == y.right {
@@ -199,7 +193,7 @@ func (tree *RedBlackTree) successor(x *Node) *Node {
 
 func (tree *RedBlackTree) predecessor(x *Node) *Node {
 	if !x.left.isNil() {
-		return tree.maximum(x.left)
+		return tree.Maximum(x.left)
 	}
 	y := x.parent
 	for !y.isNil() && x == y.left {
@@ -209,7 +203,7 @@ func (tree *RedBlackTree) predecessor(x *Node) *Node {
 	return y
 }
 
-func (tree *RedBlackTree) delete(z *Node) *Node {
+func (tree *RedBlackTree) Delete(z *Node) *Node {
 	var x, y *Node
 	if z.left.isNil() || z.right.isNil() {
 		y = z
@@ -224,7 +218,7 @@ func (tree *RedBlackTree) delete(z *Node) *Node {
 	x.parent = y.parent
 
 	if y.parent.isNil() {
-		tree.root = x
+		tree.Root = x
 	} else {
 		if y == y.parent.left {
 			y.parent.left = x
@@ -246,7 +240,7 @@ func (tree *RedBlackTree) delete(z *Node) *Node {
 }
 
 func (tree *RedBlackTree) deleteFixup(x *Node) {
-	for x != tree.root && x.color == Black {
+	for x != tree.Root && x.color == Black {
 		if x == x.parent.left {
 			w := x.parent.right
 			if w.color == Red {
@@ -269,7 +263,7 @@ func (tree *RedBlackTree) deleteFixup(x *Node) {
 				x.parent.color = Black
 				w.right.color = Black
 				tree.leftRotate(x.parent)
-				x = tree.root
+				x = tree.Root
 			}
 		} else {
 			w := x.parent.left
@@ -293,15 +287,15 @@ func (tree *RedBlackTree) deleteFixup(x *Node) {
 				x.parent.color = Black
 				w.left.color = Black
 				tree.rightRotate(x.parent)
-				x = tree.root
+				x = tree.Root
 			}
 		}
 	}
 	x.color = Black
 }
 
-func (tree *RedBlackTree) search(key int) *Node {
-	x := tree.root
+func (tree *RedBlackTree) Search(key int) *Node {
+	x := tree.Root
 	for !x.isNil() && x.key != key {
 		if key < x.key {
 			x = x.left
@@ -312,66 +306,18 @@ func (tree *RedBlackTree) search(key int) *Node {
 	return x
 }
 
-func (tree *RedBlackTree) inorderWalk(callback func(int)) {
-	x := tree.minimum(nil)
+func (tree *RedBlackTree) InorderWalk(callback func(int)) {
+	x := tree.Minimum(nil)
 	for !x.isNil() {
 		callback(x.key)
 		x = tree.successor(x)
 	}
 }
 
-func (tree *RedBlackTree) reverseInorderWalk(callback func(int)) {
-	x := tree.maximum(nil)
+func (tree *RedBlackTree) ReverseInorderWalk(callback func(int)) {
+	x := tree.Maximum(nil)
 	for !x.isNil() {
 		callback(x.key)
 		x = tree.predecessor(x)
-	}
-}
-
-func rbt_bm() time.Duration {
-	n := 100000
-	a1 := make([]int, 0)
-	a2 := make([]int, 0)
-	for i := 0; i < n; i++ {
-		a1 = append(a1, rand.Int())
-		a2 = append(a2, rand.Int())
-	}
-	start := time.Now()
-
-	tree := NewRedBlackTree()
-
-	for i := 0; i < n; i++ {
-		tree.add(i)
-	}
-	for i := 0; i < n; i++ {
-		tree.delete(tree.root)
-	}
-
-	tree = NewRedBlackTree()
-	for _, e := range a1 {
-		tree.add(e)
-	}
-	for _, e := range a2 {
-		tree.search(e)
-	}
-	tree.inorderWalk(func(x int) {
-		_ = x + 1
-	})
-	tree.reverseInorderWalk(func(x int) {
-		_ = x + 1
-	})
-	for i := 0; i < n; i++ {
-		tree.minimum(nil)
-	}
-	for i := 0; i < n; i++ {
-		tree.maximum(nil)
-	}
-
-	return time.Now().Sub(start)
-}
-
-func main() {
-	for i := 0; i < 10; i++ {
-		fmt.Println(rbt_bm())
 	}
 }
